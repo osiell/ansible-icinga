@@ -1,8 +1,11 @@
 ---
 
-- name: Configure Nagios CGI
-  template: src={{ ansible_distribution_release }}/cgi.cfg.j2
-        dest={{ nagios_cgi_file }}
-        owner=root group=root mode=0644
-        backup=yes
-  notify: Reload Nagios
+- name: Configure Icinga CGI
+  lineinfile:
+    dest: "{{ icinga_cgi_file }}"
+    regexp: '^#?{{ item.option }}'
+    line: '{{ item.option }}={{ item.value }}'
+    state: "{{ item.state|default('present') }}"
+    backup: yes
+  with_items: "{{ icinga_cgi_options }}"
+  notify: Reload Icinga

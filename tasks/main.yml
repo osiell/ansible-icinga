@@ -2,33 +2,33 @@
 
 - include: install.yml
   tags:
-    - nagios
-    - nagios_server
-    - nagios_server_install
+    - icinga
+    - icinga_server
+    - icinga_server_install
 
-- include: config_nagios.yml
+- include: config_icinga.yml
   tags:
-    - nagios
-    - nagios_server
-    - nagios_server_config
+    - icinga
+    - icinga_server
+    - icinga_server_config
 
 - include: config_nsca.yml
   tags:
-    - nagios
-    - nagios_server
-    - nagios_server_config
+    - icinga
+    - icinga_server
+    - icinga_server_config
 
 - include: config_cgi.yml
   tags:
-    - nagios
-    - nagios_server
-    - nagios_server_config
-    - nagios_server_config_cgi
+    - icinga
+    - icinga_server
+    - icinga_server_config
+    - icinga_server_config_cgi
 
 - include: config_apache.yml
   tags:
-    - nagios
-    - nagios_server
-    - nagios_server_config
-    - nagios_server_config_cgi
-    - nagios_server_config_apache
+    - icinga
+    - icinga_server
+    - icinga_server_config
+    - icinga_server_config_cgi
+    - icinga_server_config_apache

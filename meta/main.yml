@@ -3,18 +3,14 @@
 galaxy_info:
   author: Sébastien Alix
   company: OSIELL
-  description: Ansible role to install and configure a Nagios server
+  description: Ansible role to install and configure an Icinga 1.X server
                (with NSCA) on Debian and Ubuntu platforms.
   license: GPLv3
   min_ansible_version: 1.8
   platforms:
     - name: Debian
       versions:
-        - wheezy
-        - jessie
-    - name: Ubuntu
-      versions:
-        - trusty
+        - stretch
   categories:
     - monitoring
     - system

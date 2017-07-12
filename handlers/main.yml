@@ -1,8 +1,11 @@
 # file: nagios-server/handlers/main.yml
 
-- name: Reload Nagios
+- name: Reconfigure icinga-common
+  command: dpkg-reconfigure -f noninteractive icinga-common
+
+- name: Reload Icinga
   service:
-    name: "{{ nagios_service }}"
+    name: "{{ icinga_service }}"
     state: reloaded
 
 - name: Reload NSCA
@@ -12,8 +15,8 @@
 
 - name: Restart Apache
   service: name=apache2 state=restarted
-  when: nagios_a2_config
+  when: icinga_a2_config
 
 - name: Reload Apache
   service: name=apache2 state=reloaded
-  when: nagios_a2_config
+  when: icinga_a2_config

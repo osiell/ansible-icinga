@@ -1,40 +1,40 @@
-{% if nagios_a2_http_port %}
-<VirtualHost *:{{ nagios_a2_http_port }}>
-    ServerName {{ nagios_a2_server_name }}
-{% if nagios_a2_http2https %}
-    Redirect permanent / https://{{ nagios_a2_server_name }}
+{% if icinga_a2_http_port %}
+<VirtualHost *:{{ icinga_a2_http_port }}>
+    ServerName {{ icinga_a2_server_name }}
+{% if icinga_a2_http2https %}
+    Redirect permanent / https://{{ icinga_a2_server_name }}
 
-    ErrorLog ${APACHE_LOG_DIR}/nagios-error.log
-    CustomLog ${APACHE_LOG_DIR}/nagios-access.log combined
+    ErrorLog ${APACHE_LOG_DIR}/icinga-error.log
+    CustomLog ${APACHE_LOG_DIR}/icinga-access.log combined
 {% else %}
-    ServerAdmin {{ nagios_a2_server_admin }}
+    ServerAdmin {{ icinga_a2_server_admin }}
 
-    ErrorLog ${APACHE_LOG_DIR}/nagios-error.log
-    CustomLog ${APACHE_LOG_DIR}/nagios-access.log combined
+    ErrorLog ${APACHE_LOG_DIR}/icinga-error.log
+    CustomLog ${APACHE_LOG_DIR}/icinga-access.log combined
 
-    DocumentRoot /usr/share/nagios3/htdocs
+    DocumentRoot /usr/share/icinga/htdocs
 
 {% endif %}
 </VirtualHost>
 {% endif %}
 
-{% if nagios_a2_https_port %}
+{% if icinga_a2_https_port %}
 <IfModule mod_ssl.c>
 
-<VirtualHost *:{{ nagios_a2_https_port }}>
-    ServerName {{ nagios_a2_server_name }}
-    ServerAdmin {{ nagios_a2_server_admin }}
+<VirtualHost *:{{ icinga_a2_https_port }}>
+    ServerName {{ icinga_a2_server_name }}
+    ServerAdmin {{ icinga_a2_server_admin }}
 
-    ErrorLog ${APACHE_LOG_DIR}/nagios-ssl-error.log
-    CustomLog ${APACHE_LOG_DIR}/nagios-ssl-access.log combined
+    ErrorLog ${APACHE_LOG_DIR}/icinga-ssl-error.log
+    CustomLog ${APACHE_LOG_DIR}/icinga-ssl-access.log combined
 
-    DocumentRoot /usr/share/nagios3/htdocs
+    DocumentRoot /usr/share/icinga/htdocs
 
     SSLEngine on
-    SSLCertificateFile      {{ nagios_a2_ssl_cert_file }}
-    SSLCertificateKeyFile   {{ nagios_a2_ssl_cert_keyfile }}
-{% if nagios_a2_ssl_cert_chainfile %}
-    SSLCertificateChainFile {{ nagios_a2_ssl_cert_chainfile }}
+    SSLCertificateFile      {{ icinga_a2_ssl_cert_file }}
+    SSLCertificateKeyFile   {{ icinga_a2_ssl_cert_keyfile }}
+{% if icinga_a2_ssl_cert_chainfile %}
+    SSLCertificateChainFile {{ icinga_a2_ssl_cert_chainfile }}
 {% endif %}
     BrowserMatch "MSIE [2-6]" \
                 nokeepalive ssl-unclean-shutdown \

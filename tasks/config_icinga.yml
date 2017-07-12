@@ -1,0 +1,64 @@
+---
+
+- name: Copy custom configuration directories (local directories)
+  copy: src={{ item.src }}
+        dest={{ item.dest }}
+  with_items: "{{ icinga_config_cfg_dirs_copy }}"
+  notify: Reload Icinga
+
+- name: Clone custom configuration directories (Git)
+  git:  repo={{ item.repo }}
+        dest={{ item.dest }}
+        version={{ item.version }}
+  with_items: "{{ icinga_config_cfg_dirs_git }}"
+  notify: Reload Icinga
+
+- name: Clone custom configuration directories (Mercurial)
+  hg:   repo={{ item.repo }}
+        dest={{ item.dest }}
+        revision={{ item.version }}
+  with_items: "{{ icinga_config_cfg_dirs_hg }}"
+  notify: Reload Icinga
+
+- name: Configure Icinga - Load directories
+  lineinfile:
+    dest: "{{ icinga_config_file }}"
+    regexp: '^cfg_dir={{ item.dest }}'
+    line: 'cfg_dir={{ item.dest }}'
+    insertafter: "^# OBJECT CONFIGURATION FILE.*"
+    state: "{{ item.state|default('present') }}"
+    backup: yes
+  with_items: "{{ icinga_config_cfg_dirs_copy + icinga_config_cfg_dirs_git + icinga_config_cfg_dirs_hg }}"
+  notify: Reload Icinga
+
+- name: Configure Icinga - Options
+  lineinfile:
+    dest: "{{ icinga_config_file }}"
+    regexp: '^#?{{ item.option }}{{ (item.multi|default(False)) and ("=%s" % item.value) or "" }}'
+    line: '{{ item.option }}={{ item.value }}'
+    insertafter: "{{ item.insertafter|default('EOF') }}"
+    state: "{{ item.state|default('present') }}"
+    backup: yes
+  with_items: "{{ icinga_config_options }}"
+  notify: Reload Icinga
+
+- name: Apache htpasswd users
+  htpasswd:
+    path: "{{ icinga_htpasswd_file }}"
+    name: "{{ item.name }}"
+    password: "{{ item.password }}"
+  with_items: "{{ icinga_htpasswd_users }}"
+  register: htpasswd
+
+- name: Fix Config Permissions
+  file: dest=/etc/icinga/htpasswd.users
+        owner="www-data" group="www-data"
+  when: htpasswd.changed
+
+- name: Debconf - Check external commands
+  debconf:
+    name: icinga-common
+    question: icinga/check_external_commands
+    value: "{{ (icinga_config_check_external_commands|default(1)) == 1 and 'true' or 'false' }}"
+    vtype: boolean
+  notify: Reconfigure icinga-common

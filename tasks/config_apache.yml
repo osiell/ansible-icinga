@@ -1,34 +1,48 @@
 ---
 
-- name: Enable some required modules
+- name: Enable required Apache modules
   apache2_module: state=present name={{ item }}
-  with_items:
-    - ssl
-  when: nagios_a2_config
+  with_items: "{{ icinga_a2_modules }}"
+  when: icinga_a2_config
   notify: Restart Apache
 
+- name: Set the 'icinga_cgi_url_html_path' variable from CGI options
+  set_fact:
+    icinga_cgi_url_html_path: |
+        {% set vars = {'result': '/icinga'} %}
+        {% for item in icinga_cgi_options %}
+            {% if item.option == 'url_html_path' %}
+                {% if vars.update({'result': item.value}) %}{% endif %}
+            {% endif %}
+        {% endfor %}
+        {{ vars['result'] }}
+
+- name: Cleanup the 'icinga_cgi_url_html_path' value
+  set_fact:
+    icinga_cgi_url_html_path: "{{ icinga_cgi_url_html_path.strip() }}"
+
 - name: Configure Apache
-  template: src={{ ansible_distribution_release }}/a2-nagios3.conf.j2
-            dest=/etc/nagios3/apache2.conf
+  template: src={{ ansible_distribution_release }}/a2-icinga.conf.j2
+            dest={{ icinga_a2_config_file }}
             owner=root group=root mode=0644
             backup=yes
-  when: nagios_a2_config
+  when: icinga_a2_config
   notify: Reload Apache
 
 - name: Enable Apache configuration
-  command: a2enconf nagios3
+  command: a2enconf icinga
   changed_when: False
-  when: nagios_a2_config and ansible_distribution_release != 'wheezy'
+  when: icinga_a2_config and ansible_distribution_release != 'wheezy'
 
 - name: Configure Apache virtual host
   template: src=vhost.j2
-            dest=/etc/apache2/sites-available/{{ nagios_a2_vhost_file }}
+            dest=/etc/apache2/sites-available/{{ icinga_a2_vhost_file }}
             owner=root group=root mode=0644
             backup=yes
-  when: nagios_a2_config
+  when: icinga_a2_config
   notify: Reload Apache
 
 - name: Enable Apache virtual host
-  command: a2ensite {{ nagios_a2_vhost_file }}
+  command: a2ensite {{ icinga_a2_vhost_file }}
   changed_when: False
-  when: nagios_a2_config
+  when: icinga_a2_config
